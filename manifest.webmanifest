@@ -1,0 +1,16 @@
+{
+ "name": "Tafsiirka Sheekh Maxamed Macallin",
+ "short_name": "SMM Tafsiir",
+ "start_url": ".",
+ "display": "standalone",
+ "background_color": "#efe9dc",
+ "theme_color": "#17543c",
+ "lang": "so",
+ "icons": [
+  {
+   "src": "icon.svg",
+   "sizes": "any",
+   "type": "image/svg+xml"
+  }
+ ]
+}
