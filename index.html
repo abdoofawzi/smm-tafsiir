@@ -583,5 +583,17 @@ renderIndex();runDict();
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>fitPage());
 render();
 </script>
+<script>
+/* Android back button: close the top-most panel, return true if handled */
+window.smmBack=function(){try{
+ var on=function(id){var e=document.getElementById(id);return e&&e.classList.contains('on')};
+ if(on('pgModal')){document.getElementById('pgModal').classList.remove('on');return true}
+ if(on('menu')){closeMenu();return true}
+ if(on('sheet')){document.getElementById('sheet').classList.remove('on');return true}
+ if(on('ayBar')){clearAyah();return true}
+ if(VIEW!=='indexView'&&VIEW!=='mushafView'){showView(PREV||'mushafView');return true}
+ if(VIEW==='mushafView'){showView('indexView');return true}
+}catch(e){}return false};
+</script>
 </body>
 </html>
