@@ -152,6 +152,51 @@ textarea{width:calc(100% - 24px);margin:0 12px;min-height:110px;font-family:ui-m
 .modal.on{display:flex}
 .mbox{background:var(--card);color:var(--ink);border-radius:16px;padding:18px;width:min(92vw,340px)}
 .mbox input{width:100%;font-size:18px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);margin:10px 0}
+/* ===== v3 reader: mushaf page laid out like Quran for Android ===== */
+:root{--pg1:#ebe4d1;--pg2:#fcf9f0;--mk:#b06f0a;--selbg:rgba(46,84,150,.16);--playbg:rgba(233,162,59,.30)}
+html[data-theme=dark]{--pg1:#000;--pg2:#000;--mk:#f0b04f;--selbg:rgba(120,150,225,.30);--playbg:rgba(240,176,79,.30)}
+#mushafView{background:linear-gradient(90deg,var(--pg1) 0,var(--pg2) 8%,var(--pg2) 92%,var(--pg1) 100%)}
+#mushafView .pagewrap,#mushafView.full .pagewrap{padding:0;overflow:hidden;align-items:stretch}
+#mushafView .pagewrap.scrolly{overflow:auto}
+.page{width:100%;max-width:none;height:100%;padding:0;display:flex;flex-direction:column}
+.pagewrap.scrolly .page{height:auto}
+.phead{flex:none;font-family:Inter,system-ui,sans-serif;font-size:13px;color:var(--mute);padding:9px 16px 2px;direction:ltr;opacity:.9}
+.pfoot{flex:none;font-family:Inter,system-ui,sans-serif;font-size:13px;color:var(--mute);text-align:right;padding:2px 18px calc(8px + env(safe-area-inset-bottom));opacity:.9}
+.lines{flex:1;min-height:0;display:flex;flex-direction:column;position:relative;margin:0 auto;padding:0;width:100%}
+.lines.few{justify-content:center}
+.lines.wait{visibility:hidden}
+.ln,.ln.g{flex:1;position:relative;z-index:1;line-height:1.5;min-height:0}
+.lines.few .ln,.pagewrap.scrolly .ln{flex:none;line-height:1.95}
+.ln .w{padding:0;border-radius:0}
+.ln .w.a-sel,.ln .w.a-play,html[data-theme=dark] .ln .w.a-sel{background:none}
+.ln .w.mk{color:var(--mk)}
+.ln.sh{flex:1;margin:5px 4px}
+.hlbox{position:absolute;z-index:0;pointer-events:none}
+.hlbox.s{background:var(--selbg)}.hlbox.p{background:var(--playbg)}
+#themeB{display:none}
+/* popup over the selected ayah */
+.aybar{left:0;top:0;bottom:auto!important;transform:none;transition:opacity .12s;opacity:0;pointer-events:none;border-radius:4px;padding:0;gap:0;box-shadow:0 4px 14px rgba(0,0,0,.35);max-width:none}
+.aybar.on{transform:none;opacity:1;pointer-events:auto}
+.aybar button{flex-direction:row;min-width:0;width:54px;height:50px;padding:0;border-radius:0;justify-content:center}
+.aybar button svg{width:25px;height:25px;fill:currentColor}
+.aybar button.act{color:var(--acc)}
+.aybar .tip{position:absolute;left:var(--tx,30px);bottom:-8px;margin-left:-9px;border:9px solid transparent;border-top-color:var(--bar);border-bottom:0}
+.aybar.below .tip{bottom:auto;top:-8px;border:9px solid transparent;border-bottom-color:var(--bar);border-top:0}
+/* audio bar */
+.player{padding:0 0 env(safe-area-inset-bottom);border-radius:14px 14px 0 0;overflow:hidden}
+.pprog{height:3px;background:rgba(255,255,255,.14)}.pprog i{display:block;height:100%;width:0;background:var(--acc)}
+.pmore{display:none;padding:10px 16px 0}
+.player.exp .pmore{display:block}
+.pmore .pt{padding:0 0 4px}
+.times{align-items:center}
+.times .pb{min-width:56px;height:30px;border-radius:15px;font-size:12px;background:rgba(255,255,255,.1)}
+.player .prow{justify-content:space-around;gap:0;padding:4px 6px}
+.player .prow .pb{min-width:46px;height:50px;border-radius:12px;font-size:14px;display:grid;place-items:center}
+.player .prow .pb svg{width:26px;height:26px;fill:currentColor}
+.player .prow .pb.big{background:none;color:var(--onbar);min-width:46px;height:50px}
+.player.exp #pGear{color:var(--acc)}
+.h3.pw{cursor:pointer}
+
 </style>
 </head>
 <body>
@@ -176,9 +221,10 @@ textarea{width:calc(100% - 24px);margin:0 12px;min-height:110px;font-family:ui-m
 <!-- ===== Reader ===== -->
 <div class="view" id="mushafView">
   <div class="appbar">
-    <button class="ib" id="rBack" title="Liiska"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    <button class="ib" id="rBack" title="Dib"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 5l-7 7 7 7"/></svg></button>
     <div class="ttl"><b id="rTitle">—</b><span id="loc">—</span></div>
     <button class="ib" id="pageBm" title="Calaamadee boggan"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg></button>
+    <button class="ib" id="wordsB" title="Fasiraadda erayada boggan"><svg viewBox="0 0 24 24"><path d="M12 6c-2-1.6-5-2-8-1.2v13c3-.8 6-.4 8 1.2 2-1.6 5-2 8-1.2v-13c-3-.8-6-.4-8 1.2zM12 6v13"/></svg></button>
     <button class="ib" id="themeB" title="Habeen / maalin"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/></svg></button>
     <button class="ib menuB" title="Menu"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="12" cy="19" r="1.2"/></svg></button>
   </div>
@@ -218,13 +264,11 @@ textarea{width:calc(100% - 24px);margin:0 12px;min-height:110px;font-family:ui-m
 
 <!-- ===== Ayah action bar ===== -->
 <div class="aybar" id="ayBar">
-  <span class="ak" id="ayK">—</span>
-  <button class="pri" id="abPlay"><i>▶</i>Tafsiir</button>
-  <button id="abWords"><i>📖</i>Erayada</button>
-  <button id="abBm"><i>🔖</i>Calaamad</button>
-  <button id="abPrev"><i>‹</i>Hore</button>
-  <button id="abNext"><i>›</i>Xigta</button>
-  <button id="abX"><i>✕</i>Xir</button>
+  <button id="abBm" title="Calaamad"><svg viewBox="0 0 24 24"><path d="M17 3H7a2 2 0 00-2 2v16l7-3 7 3V5a2 2 0 00-2-2zm0 15l-5-2.2L7 18V5h10z"/></svg></button>
+  <button id="abWords" title="Fasiraadda erayada"><svg viewBox="0 0 24 24"><path d="M21 5c-1.1-.35-2.3-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.450 4.900 1 6v14.650c0 .25.250.5.5.5.1 0 .15-.05.250-.05C3.100 20.450 5.050 20 6.500 20c1.950 0 4.050.4 5.500 1.500 1.350-.85 3.800-1.500 5.500-1.500 1.650 0 3.350.3 4.750 1.050.1.05.15.05.250.05.250 0 .5-.250.5-.5V6c-.6-.45-1.250-.750-2-1zm0 13.500c-1.100-.350-2.300-.5-3.500-.5-1.700 0-4.150.650-5.500 1.500V8c1.350-.850 3.800-1.500 5.500-1.500 1.200 0 2.400.150 3.500.5z"/></svg></button>
+  <button id="abShare" title="La wadaag"><svg viewBox="0 0 24 24"><path d="M18 16.080c-.76 0-1.440.3-1.960.77L8.910 12.700c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.050-4.110c.54.5 1.250.81 2.040.81 1.660 0 3-1.340 3-3s-1.340-3-3-3-3 1.340-3 3c0 .24.04.47.09.7L8.040 9.810C7.500 9.310 6.790 9 6 9c-1.660 0-3 1.340-3 3s1.340 3 3 3c.79 0 1.500-.31 2.040-.81l7.120 4.160c-.05.21-.08.43-.08.65 0 1.610 1.310 2.920 2.920 2.920s2.920-1.310 2.920-2.920-1.310-2.920-2.920-2.920z"/></svg></button>
+  <button id="abPlay" title="Dhageyso tafsiirka"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+  <i class="tip"></i>
 </div>
 
 <div class="sheet" id="sheet">
@@ -234,17 +278,21 @@ textarea{width:calc(100% - 24px);margin:0 12px;min-height:110px;font-family:ui-m
 </div>
 
 <div class="player" id="player">
-  <div class="prow">
-    <button class="pb" id="pBack">−10</button>
-    <button class="pb big" id="pPlay">▶</button>
-    <button class="pb" id="pFwd">+10</button>
+  <div class="pprog"><i id="pBar"></i></div>
+  <div class="pmore">
     <div class="pt"><b id="pTitle">—</b><span id="pSub"></span></div>
-    <button class="pb" id="pRate">1×</button>
-    <button class="pb" id="pClose">✕</button>
+    <input type="range" class="seek" id="pSeek" min="0" max="1000" value="0">
+    <div class="times"><span id="pCur">0:00</span><button class="pb" id="pBack">−10s</button><button class="pb" id="pFwd">+10s</button><span id="pDur">0:00</span></div>
   </div>
-  <input type="range" class="seek" id="pSeek" min="0" max="1000" value="0">
-  <div class="times"><span id="pCur">0:00</span><span id="pDur">0:00</span></div>
-  <button class="mark" id="pMark">📍 Calaamadee: aayaddan halkan ayay ka bilaabataa</button>
+  <div class="prow">
+    <button class="pb" id="pClose" title="Jooji"><svg viewBox="0 0 24 24"><path d="M6 6h12v12H6z"/></svg></button>
+    <button class="pb" id="pPrevAy" title="Aayaddii hore"><svg viewBox="0 0 24 24"><path d="M11 18V6l-8.500 6zm.500-6l8.500 6V6z"/></svg></button>
+    <button class="pb" id="pPlay" title="Ciyaar / hakad"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+    <button class="pb" id="pNextAy" title="Aayadda xigta"><svg viewBox="0 0 24 24"><path d="M4 18l8.500-6L4 6zm9-12v12l8.500-6z"/></svg></button>
+    <button class="pb" id="pMark" title="Calaamadee"><svg viewBox="0 0 24 24"><path d="M12 2C8.130 2 5 5.130 5 9c0 5.250 7 13 7 13s7-7.750 7-13c0-3.870-3.130-7-7-7zm0 9.500A2.500 2.500 0 1112 6.500a2.500 2.500 0 010 5z"/></svg></button>
+    <button class="pb" id="pRate" title="Xawaaraha">1×</button>
+    <button class="pb" id="pGear" title="Faahfaahin"><svg viewBox="0 0 24 24"><path d="M3 17v2h6v-2zM3 5v2h10V5zm10 16v-2h8v-2h-8v-2h-2v6zM7 9v2H3v2h4v2h2V9zm14 4v-2H11v2zm-6-4h2V7h4V5h-4V3h-2z"/></svg></button>
+  </div>
 </div>
 
 <div class="scrim" id="scrim"></div>
@@ -281,7 +329,7 @@ let VIEW='indexView',PREV='indexView';
 function showView(v){if(v!==VIEW){PREV=VIEW==='mushafView'||VIEW==='indexView'?VIEW:PREV;VIEW=v}
   document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.id===v));closeMenu();
   if(v!=='mushafView'){$('ayBar').classList.remove('on');$('sheet').classList.remove('on')}
-  if(v==='mushafView')requestAnimationFrame(fitPage);if(v==='indexView')renderIndex();if(v==='dictView')setTimeout(()=>$('dq').focus(),50)}
+  if(v==='mushafView'){requestAnimationFrame(fitPage);toggleFull(false);window._fh=setTimeout(()=>{if(!$('menu').classList.contains('on'))toggleFull(true)},3500)}if(v==='indexView')renderIndex();if(v==='dictView')setTimeout(()=>$('dq').focus(),50)}
 document.querySelectorAll('.backB').forEach(b=>b.onclick=()=>showView(PREV||'indexView'));
 function closeMenu(){$('menu').classList.remove('on');$('scrim').classList.remove('on')}
 document.querySelectorAll('.menuB').forEach(b=>b.onclick=()=>{$('menu').classList.add('on');$('scrim').classList.add('on')});
@@ -291,27 +339,32 @@ $('menu').querySelectorAll('button').forEach(b=>b.onclick=()=>{const m=b.dataset
   else if(m==='theme')$('themeB').click();else showView(m)});
 $('rBack').onclick=()=>showView('indexView');
 // tap on the page (not on an ayah) shows/hides the bars, like a mushaf app
-function toggleFull(force){const v=$('mushafView');const f=force!==undefined?force:!v.classList.contains('full');v.classList.toggle('full',f)}
+function toggleFull(force){clearTimeout(window._fh);const v=$('mushafView');const f=force!==undefined?force:!v.classList.contains('full');v.classList.toggle('full',f)}
 
 
 // ---------- mushaf ----------
 let cur=store.get('page',1), sel=null, playingKey=null;
 // official KFGQPC (1405H Madinah) page fonts, loaded per page from the QUL font CDN
 const QF={},QOK={};
+const QSRC=['https://static-cdn.tarteel.ai/qul/fonts/quran_fonts/v1/woff2/p','https://verses.quran.foundation/fonts/quran/hafs/v1/woff2/p','https://raw.githubusercontent.com/quran/quran.com-frontend-next/production/public/fonts/quran/hafs/v1/woff2/p'];
+const QTRY={};
 function loadPageFont(p){if(p<1||p>604)return Promise.resolve(false);if(QF[p])return QF[p];
-  try{const f=new FontFace('qcf'+p,`url(https://static-cdn.tarteel.ai/qul/fonts/quran_fonts/v1/woff2/p${p}.woff2)`);
-  QF[p]=f.load().then(ff=>{document.fonts.add(ff);QOK[p]=1;return true}).catch(()=>false)}catch(e){QF[p]=Promise.resolve(false)}return QF[p]}
+  const one=i=>{if(i>=QSRC.length)return Promise.resolve(false);
+    try{const f=new FontFace('qcf'+p,`url(${QSRC[i]}${p}.woff2)`);
+      return f.load().then(ff=>{document.fonts.add(ff);QOK[p]=1;return true}).catch(()=>one(i+1))}catch(e){return one(i+1)}};
+  QF[p]=one(0).then(ok=>{if(!ok){delete QF[p];QTRY[p]=(QTRY[p]||0)+1}return ok});return QF[p]}
 function render(){
   cur=Math.max(1,Math.min(604,cur));store.set('page',cur);
   const G=!!QOK[cur];const want=cur;
-  if(!G)loadPageFont(cur).then(ok=>{if(ok&&cur===want)render()});
+  if(!G)loadPageFont(cur).then(ok=>{if(cur!==want)return;if(ok)render();else{const b=$('lines');if(b)b.classList.remove('wait');if(QTRY[want]<6)setTimeout(()=>{if(cur===want&&!QOK[want])render()},4000)}});
   loadPageFont(cur+1);loadPageFont(cur-1);
   const [juz,lines]=PAGES[cur-1];
   const firstS=(lines.find(l=>Array.isArray(l)&&Array.isArray(l[0]))||[[1]])[0][0];
-  $('rTitle').textContent=`${LAT[firstS-1]} · ${NAMES[firstS-1]}`;$('loc').textContent=`Juz ${juz} · Bogga ${cur}`;
+  $('rTitle').textContent=LAT[firstS-1];$('loc').textContent=`Bogga ${cur}, Juz' ${juz}`;
   $('pgLbl').textContent='Bogga '+cur;$('jzLbl').textContent='Juz '+juz;$('pgSlider').value=cur;
   const pk=pageKeys(cur);$('pageBm').style.color=pk.some(isBM)?'var(--acc)':'';
-  let h=`<div class="phead"><span>سورة ${esc(NAMES[firstS-1])}</span><span>الجزء ${AD(juz)}</span></div><div class="lines" id="lines">`;
+  let h=`<div class="phead"><span>${esc(LAT[firstS-1])}</span><span>Juz' ${juz}</span></div><div class="lines${(!G&&!QTRY[cur])?' wait':''}" id="lines">`;
+  if(!G&&!QTRY[cur])setTimeout(()=>{const b=$('lines');if(b)b.classList.remove('wait')},2500);
   for(const l of lines){
     if(l===0){h+='<div class="ln c">&nbsp;</div>';continue}
     if(typeof l[0]==='string'){
@@ -322,31 +375,59 @@ function render(){
     h+=G?`<div class="ln g" style="font-family:qcf${cur},'Amiri Quran'">`:'<div class="ln">';
     for(const [s,a,t,e,g] of l){
       const k=s+':'+a;
-      if(G){if(g)for(const w of g.split(' '))h+=`<span class="w" data-k="${k}">${w}</span>`;continue}
+      if(G){if(g){const gs=g.split(' ');gs.forEach((w,i)=>{h+=`<span class="w${e&&i===gs.length-1?' mk':''}" data-k="${k}">${w}</span>`})}continue}
       if(t)for(const w of t.split(' '))h+=`<span class="w" data-k="${k}">${w}</span>`;
       if(e)h+=`<span class="w em" data-k="${k}">\u06DD${AD(a)}</span>`;
     }
     h+='</div>';
   }
-  h+=`</div><div class="pfoot">${AD(cur)}</div>`;
+  h+=`</div><div class="pfoot">${cur}</div>`;
   $('page').innerHTML=h;
-  fitPage();paintSel();
+  fitPage();paintSel();placePop();
 }
 function fitPage(){
-  const box=$('lines');if(!box||!box.clientWidth)return;
-  const W=box.clientWidth;const lns=[...box.querySelectorAll('.ln')];
-  let fs=Math.min(30,W/15.5);box.style.fontSize=fs+'px';
-  // measure natural width
-  let maxw=0;lns.forEach(l=>{if(l.classList.contains('sh')||l.classList.contains('bs'))return;l.style.justifyContent='flex-start';l.style.gap='.25em';maxw=Math.max(maxw,l.scrollWidth)});
-  if(maxw>W){fs=fs*W/maxw*0.985;box.style.fontSize=fs+'px'}
-  const center=cur<=2;
-  lns.forEach(l=>{if(l.classList.contains('sh')||l.classList.contains('bs'))return;const nw=l.scrollWidth;l.style.justifyContent='';l.style.gap='';l.classList.toggle('c',center||nw<W*0.78)});
-  box.querySelectorAll('.sh,.bs').forEach(x=>x.style.fontSize=(fs*0.92)+'px');
+  const box=$('lines'),wrap=$('pagewrap');if(!box||!wrap.clientWidth)return;
+  const G=!!QOK[cur];
+  const lns=[...box.querySelectorAll('.ln')],txt=lns.filter(l=>!l.classList.contains('sh')&&!l.classList.contains('bs'));
+  const PW=wrap.clientWidth,PH=wrap.clientHeight,few=cur<=2,land=PH<PW*1.15;
+  wrap.classList.toggle('scrolly',land);box.classList.toggle('few',few);
+  let availW=Math.min(PW-Math.max(14,PW*0.04),land?820:PH*0.70);
+  box.style.width=availW+'px';box.style.fontSize='20px';
+  const gap=G?'0px':'.25em';let maxw=1;const nat=new Map();
+  txt.forEach(l=>{l.classList.remove('c');l.style.justifyContent='flex-start';l.style.gap=gap;let w=0,n=0;for(const c of l.children){w+=c.getBoundingClientRect().width;n++}if(!G&&n>1)w+=(n-1)*5;nat.set(l,w);maxw=Math.max(maxw,w)});
+  let fs=Math.min(46,20*availW/maxw*0.995);
+  if(!land&&!few){const slot=box.clientHeight/Math.max(1,lns.length);if(slot>8&&fs*1.5>slot){fs=slot/1.5;box.style.width=Math.ceil(maxw*fs/20/0.995)+'px'}}
+  if(few)fs=Math.min(fs,34);
+  box.style.fontSize=fs+'px';
+  txt.forEach(l=>{const short=few||nat.get(l)<maxw*0.80;l.style.justifyContent='';l.style.gap=short?(G?'.12em':'.28em'):'';l.classList.toggle('c',short)});
+  box.querySelectorAll('.sh,.bs').forEach(x=>x.style.fontSize=(fs*0.9)+'px');
+  paintHL();placePop();
+}
+function paintHL(){
+  const box=$('lines'),wrap=$('pagewrap');if(!box)return;box.querySelectorAll('.hlbox').forEach(x=>x.remove());
+  const br=box.getBoundingClientRect(),wr=wrap.getBoundingClientRect();
+  [[sel,'s'],[playingKey&&playingKey!==sel?playingKey:null,'p']].forEach(([k,c])=>{if(!k)return;
+    box.querySelectorAll('.ln').forEach(l=>{const all=l.querySelectorAll('.w');if(!all.length)return;
+      const ws=[...all].filter(w=>w.dataset.k===k);if(!ws.length)return;
+      const lr=l.getBoundingClientRect();let x0=1e9,x1=-1e9;ws.forEach(w=>{const r=w.getBoundingClientRect();x0=Math.min(x0,r.left);x1=Math.max(x1,r.right)});
+      const ext=Math.min(16,Math.max(0,br.left-wr.left));if(!l.classList.contains('c')){if(ws[0]===all[0])x1=br.right+ext;if(ws[ws.length-1]===all[all.length-1])x0=br.left-ext}else{x0-=6;x1+=6}
+      const d=document.createElement('div');d.className='hlbox '+c;
+      d.style.cssText=`left:${x0-br.left}px;width:${x1-x0}px;top:${lr.top-br.top}px;height:${lr.height+0.5}px`;box.appendChild(d)})});
+}
+function placePop(){
+  const pop=$('ayBar');if(!pop.classList.contains('on'))return;
+  const ws=sel?[...document.querySelectorAll('#lines .w')].filter(w=>w.dataset.k===sel):[];
+  if(!ws.length||!$('mushafView').classList.contains('on')){pop.style.opacity=0;pop.style.pointerEvents='none';return}
+  pop.style.opacity='';pop.style.pointerEvents='';
+  const r=ws[0].getBoundingClientRect(),lr=ws[0].parentNode.getBoundingClientRect(),pw=pop.offsetWidth,ph=pop.offsetHeight,vw=innerWidth;
+  const cx=r.left+r.width/2;let x=Math.max(8,Math.min(vw-pw-8,cx-pw/2));
+  let y=lr.top-ph-9,below=false;if(y<64){y=lr.bottom+9;below=true}
+  pop.classList.toggle('below',below);pop.style.left=x+'px';pop.style.top=y+'px';pop.style.setProperty('--tx',Math.max(14,Math.min(pw-14,cx-x))+'px');
 }
 window.addEventListener('resize',()=>{clearTimeout(window._rz);window._rz=setTimeout(fitPage,120)});
 function go(p){cur=p;render();$('pagewrap').scrollTop=0}
 function pageKeys(p){const s=new Set();PAGES[p-1][1].forEach(l=>{if(Array.isArray(l)&&Array.isArray(l[0]))l.forEach(x=>s.add(x[0]+':'+x[1]))});return[...s]}
-$('pgSlider').oninput=()=>{$('pgLbl').textContent='Bogga '+$('pgSlider').value};$('pgSlider').onchange=()=>go(+$('pgSlider').value);
+$('pgSlider').oninput=()=>{clearTimeout(window._fh);$('pgLbl').textContent='Bogga '+$('pgSlider').value};$('pgSlider').onchange=()=>go(+$('pgSlider').value);
 $('pageBm').onclick=()=>{const k=sel&&pageKeys(cur).includes(sel)?sel:pageKeys(cur)[0];toggleBM(k)};
 $('nextB').onclick=()=>go(cur+1);$('prevB').onclick=()=>go(cur-1);
 document.addEventListener('keydown',e=>{if(!$('mushafView').classList.contains('on')||e.target.tagName==='INPUT')return;if(e.key==='ArrowLeft')go(cur+1);if(e.key==='ArrowRight')go(cur-1)});
@@ -355,18 +436,24 @@ let sx=null,sy=null;$('mushafView').addEventListener('touchstart',e=>{sx=e.touch
 $('mushafView').addEventListener('touchend',e=>{if(sx===null)return;const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5)go(cur+(dx>0?1:-1));sx=null});
 $('pagewrap').addEventListener('click',e=>{const w=e.target.closest('.w');if(w){selectAyah(w.dataset.k);return}
   if($('ayBar').classList.contains('on')){clearAyah();return}toggleFull()});
-function selectAyah(k){sel=k;paintSel();const[s,a]=k.split(':');$('ayK').textContent=`${LAT[s-1]} ${s}:${a}`;
-  $('abBm').querySelector('i').textContent=isBM(k)?'✅':'🔖';$('ayBar').classList.add('on');toggleFull(false);
+function selectAyah(k){sel=k;paintSel();$('abBm').classList.toggle('act',isBM(k));$('ayBar').classList.add('on');placePop();
   if($('sheet').classList.contains('on'))openAyah(k)}
 function clearAyah(){sel=null;paintSel();$('ayBar').classList.remove('on');$('sheet').classList.remove('on')}
 function focusAyah(k){showView('mushafView');if(AYPAGE[k]!==cur)go(AYPAGE[k]);selectAyah(k)}
 $('abPlay').onclick=()=>{if(!sel)return;const[s,a]=sel.split(':').map(Number);const l=lessonFor(s,a);if(!l||!HAVE.has(l.id)){openAyah(sel);toast('Casharkan weli internet-ka laguma soo dhejin');return}playAyah(s,a)};
 $('abWords').onclick=()=>{if(sel)openAyah(sel)};
-$('abBm').onclick=()=>{if(sel){toggleBM(sel);selectAyah(sel)}};
-$('abPrev').onclick=()=>{if(sel){const[s,a]=sel.split(':').map(Number);stepAyah(s,a,-1)}};
-$('abNext').onclick=()=>{if(sel){const[s,a]=sel.split(':').map(Number);stepAyah(s,a,1)}};
-$('abX').onclick=clearAyah;
-function paintSel(){const bs=new Set(BM.map(b=>b.k));document.querySelectorAll('#lines .w').forEach(w=>{w.classList.toggle('bm',bs.has(w.dataset.k));w.classList.toggle('a-sel',w.dataset.k===sel);w.classList.toggle('a-play',w.dataset.k===playingKey&&w.dataset.k!==sel)})}
+$('abBm').onclick=()=>{if(sel){toggleBM(sel);$('abBm').classList.toggle('act',isBM(sel))}};
+$('abShare').onclick=async()=>{if(!sel)return;const[s,a]=sel.split(':');const t=`${AYTXT[sel]||''} ﴿${AD(a)}﴾\n[${NAMES[s-1]} ${s}:${a}]`;
+  try{if(navigator.share){await navigator.share({text:t});return}}catch(e){if(e&&e.name==='AbortError')return}
+  try{await navigator.clipboard.writeText(t);toast('Aayadda waa la koobiyeeyay')}catch(e){const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();try{document.execCommand('copy');toast('Aayadda waa la koobiyeeyay')}catch(_){toast('Lama koobiyeyn karo')}x.remove()}};
+function openPageWords(){const ks=pageKeys(cur);let n=0,h='';
+  for(const k of ks){const ws=(TBY[k]||[]).map(i=>T.d[i]);if(!ws.length)continue;n+=ws.length;const[s,a]=k.split(':');
+    h+=`<div class="h3 pw" data-k="${k}">${esc(LAT[s-1])} ${s}:${a} ›</div><div class="wl">${ws.map(r=>`<div class="wi"><div class="ar">${esc(r[0])}</div><div class="so">${esc(r[1]||'—')}</div></div>`).join('')}</div>`}
+  $('shT').innerHTML=`Fasiraadda erayada · Bogga ${cur}<small>${n} eray</small>`;
+  $('shB').innerHTML=h||'<div class="note">Boggan eray fasiraad ah kuma jiro buugga.</div>';$('sheet').classList.add('on');$('shB').scrollTop=0;
+  $('shB').querySelectorAll('.pw').forEach(x=>x.onclick=()=>{$('sheet').classList.remove('on');selectAyah(x.dataset.k)})}
+$('wordsB').onclick=openPageWords;
+function paintSel(){const bs=new Set(BM.map(b=>b.k));document.querySelectorAll('#lines .w').forEach(w=>{w.classList.toggle('bm',bs.has(w.dataset.k));w.classList.toggle('a-sel',w.dataset.k===sel);w.classList.toggle('a-play',w.dataset.k===playingKey&&w.dataset.k!==sel)});paintHL()}
 
 // ---------- ayah sheet ----------
 function openAyah(k){
@@ -538,9 +625,9 @@ async function startLesson(l,t,k){
   requestAnimationFrame(()=>document.body.style.setProperty('--ph',$('player').offsetHeight+'px'));
   playingKey=curAyah;paintSel();
 }
-function updSub(){if(!curLesson)return;const[s,a]=curAyah.split(':');$('pSub').textContent=`Hadda: ${NAMES[s-1]}\u200E ${s}:${a}`;$('pMark').textContent=`📍 Calaamadee: aayadda ${a} halkan ayay ka bilaabataa`}
+function updSub(){if(!curLesson)return;const[s,a]=curAyah.split(':');$('pSub').textContent=`Hadda: ${NAMES[s-1]}\u200E ${s}:${a}`;$('pMark').title=`Calaamadee: aayadda ${a} halkan ayay ka bilaabataa`}
 aud.ontimeupdate=()=>{
-  $('pCur').textContent=fmt(aud.currentTime);if(!$('pSeek')._drag)$('pSeek').value=aud.duration?aud.currentTime/aud.duration*1000:0;
+  $('pCur').textContent=fmt(aud.currentTime);$('pBar').style.width=(aud.duration?aud.currentTime/aud.duration*100:0)+'%';if(!$('pSeek')._drag)$('pSeek').value=aud.duration?aud.currentTime/aud.duration*1000:0;
   if(!curLesson||!isFinite(aud.duration))return;let best=null;
   for(const e of estList(curLesson,aud.duration))if(e[1]<=aud.currentTime+0.3)best=e;
   if(best&&best[0]!==playingKey){playingKey=best[0];curAyah=best[0];updSub();paintSel();const p=AYPAGE[best[0]];if(p&&p!==cur&&$('mushafView').classList.contains('on')&&!$('sheet').classList.contains('on'))go(p)}
@@ -548,7 +635,13 @@ aud.ontimeupdate=()=>{
 aud.onloadedmetadata=()=>$('pDur').textContent=fmt(aud.duration);
 aud.onerror=()=>{if(curLesson&&curLesson.url&&aud.src===curLesson.url)toast('Maqalka lama soo dejin karo hadda — internet-ka hubi, ama faylka ka soo geli taleefanka.')};
 aud.onended=()=>{if(!curLesson)return;const i=LES.indexOf(curLesson),n=LES[i+1];if(n&&HAVE.has(n.id))startLesson(n,0,n.s1+':'+n.a1)};
-aud.onplay=()=>$('pPlay').textContent='❚❚';aud.onpause=()=>$('pPlay').textContent='▶';
+const ICO_PLAY='<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',ICO_PAUSE='<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6zm8-14v14h4V5z"/></svg>';
+aud.onplay=()=>$('pPlay').innerHTML=ICO_PAUSE;aud.onpause=()=>$('pPlay').innerHTML=ICO_PLAY;
+function jumpAy(d){if(!curLesson||!curAyah)return;let[s,a]=curAyah.split(':').map(Number);a+=d;if(a<1){if(s===1)return;s--;a=COUNTS[s-1]}else if(a>COUNTS[s-1]){if(s===114)return;s++;a=1}playAyah(s,a)}
+$('pPrevAy').onclick=()=>jumpAy(-1);$('pNextAy').onclick=()=>jumpAy(1);
+function setPH(){requestAnimationFrame(()=>{document.body.style.setProperty('--ph',$('player').offsetHeight+'px')})}
+if(store.get('pexp',false))$('player').classList.add('exp');
+$('pGear').onclick=()=>{const e=$('player').classList.toggle('exp');store.set('pexp',e);setPH()};
 $('pPlay').onclick=()=>aud.paused?aud.play():aud.pause();
 $('pBack').onclick=()=>aud.currentTime=Math.max(0,aud.currentTime-10);
 $('pFwd').onclick=()=>aud.currentTime=Math.min(aud.duration||0,aud.currentTime+10);
@@ -567,8 +660,9 @@ $('exp').onclick=async()=>{const txt=JSON.stringify({app:'smm-tafsiir',v:2,marks
 $('imp').onclick=()=>{try{const o=JSON.parse($('mapTxt').value);if(!o.marks)throw 0;for(const[n,m]of Object.entries(o.marks))MARKS[n]=Object.assign(MARKS[n]||{},m);saveMarks();renderLessons();toast('Calaamadaha waa la soo geliyay')}catch(e){toast('Qoraalka sax maaha')}};
 // theme
 function applyTheme(m){document.documentElement.dataset.theme=m;store.set('theme',m);const mc=document.querySelector('meta[name=theme-color]');if(mc)mc.content=m==='dark'?'#0b1120':'#14213d'}
-applyTheme(store.get('theme','auto')==='auto'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):store.get('theme','auto'));
-$('themeB').onclick=()=>applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
+function applyTheme2(m){applyTheme(m);store.set('theme3',m)}
+applyTheme(store.get('theme3','light'));
+$('themeB').onclick=()=>applyTheme2(document.documentElement.dataset.theme==='dark'?'light':'dark');
 // which lessons are already on archive.org (upload still running) -> only those get ▶
 (async()=>{const withUrl=LES.filter(l=>l.url&&/archive\.org\/download\//.test(l.url));if(!withUrl.length)return;
   try{const id=withUrl[0].url.split('/download/')[1].split('/')[0];
