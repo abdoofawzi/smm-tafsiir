@@ -394,7 +394,7 @@ function fitPage(){
   let availW=Math.min(PW-Math.max(14,PW*0.04),land?820:PH*0.70);
   box.style.width=availW+'px';box.style.fontSize='20px';
   const gap=G?'0px':'.25em';let maxw=1;const nat=new Map();
-  txt.forEach(l=>{l.classList.remove('c');l.style.justifyContent='flex-start';l.style.gap=gap;const w=l.scrollWidth;nat.set(l,w);maxw=Math.max(maxw,w)});
+  txt.forEach(l=>{l.classList.remove('c');l.style.justifyContent='flex-start';l.style.gap=gap;let w=0,n=0;for(const c of l.children){w+=c.getBoundingClientRect().width;n++}if(!G&&n>1)w+=(n-1)*5;nat.set(l,w);maxw=Math.max(maxw,w)});
   let fs=Math.min(46,20*availW/maxw*0.995);
   if(!land&&!few){const slot=box.clientHeight/Math.max(1,lns.length);if(slot>8&&fs*1.5>slot){fs=slot/1.5;box.style.width=Math.ceil(maxw*fs/20/0.995)+'px'}}
   if(few)fs=Math.min(fs,34);
@@ -410,7 +410,7 @@ function paintHL(){
     box.querySelectorAll('.ln').forEach(l=>{const all=l.querySelectorAll('.w');if(!all.length)return;
       const ws=[...all].filter(w=>w.dataset.k===k);if(!ws.length)return;
       const lr=l.getBoundingClientRect();let x0=1e9,x1=-1e9;ws.forEach(w=>{const r=w.getBoundingClientRect();x0=Math.min(x0,r.left);x1=Math.max(x1,r.right)});
-      if(!l.classList.contains('c')){if(ws[0]===all[0])x1=wr.right;if(ws[ws.length-1]===all[all.length-1])x0=wr.left}else{x0-=6;x1+=6}
+      const ext=Math.min(16,Math.max(0,br.left-wr.left));if(!l.classList.contains('c')){if(ws[0]===all[0])x1=br.right+ext;if(ws[ws.length-1]===all[all.length-1])x0=br.left-ext}else{x0-=6;x1+=6}
       const d=document.createElement('div');d.className='hlbox '+c;
       d.style.cssText=`left:${x0-br.left}px;width:${x1-x0}px;top:${lr.top-br.top}px;height:${lr.height+0.5}px`;box.appendChild(d)})});
 }
