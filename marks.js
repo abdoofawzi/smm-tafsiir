@@ -1,5 +1,3 @@
-// Exact ayah start times inside each lesson: lesson number -> {"surah:ayah": seconds}
-// Shared with everyone who opens the app.
 window.SMM_MARKS = {
- "8": {"2:88": 210, "2:89": 343.4}
+ "8": {"2:87": 31, "2:88": 210, "2:89": 343.4, "2:91": 721, "2:93": 982, "2:94": 1132, "2:98": 1498, "2:101": 1637}
 };
