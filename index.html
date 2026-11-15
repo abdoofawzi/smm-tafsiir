@@ -152,6 +152,17 @@ textarea{width:calc(100% - 24px);margin:0 12px;min-height:110px;font-family:ui-m
 .modal.on{display:flex}
 .mbox{background:var(--card);color:var(--ink);border-radius:16px;padding:18px;width:min(92vw,340px)}
 .mbox input{width:100%;font-size:18px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);margin:10px 0}
+/* ===== Zilal printed page viewer ===== */
+#zpView{background:#fff}
+#zpScroll{background:#fff;overflow:auto;-webkit-overflow-scrolling:touch}
+#zpImg{display:block;width:100%;max-width:none;height:auto;margin:0 auto;transition:opacity .15s}
+@media (min-width:900px){#zpImg{max-width:900px}}
+html[data-theme=dark] #zpView,html[data-theme=dark] #zpScroll{background:#111}
+html[data-theme=dark] #zpImg{filter:invert(.9)}
+.zpbar{flex:none;display:flex;background:var(--bar);color:var(--onbar);padding:6px 8px calc(6px + env(safe-area-inset-bottom));gap:8px}
+.zpbar button{flex:1;height:44px;border-radius:10px;color:var(--onbar);font:700 16px Amiri,'Amiri Quran',serif;background:rgba(255,255,255,.1)}
+.zpbar button:active{background:rgba(255,255,255,.22)}
+.zbody .zpb{font-family:Inter,system-ui,sans-serif;font-size:13.5px;direction:ltr;margin:0 0 12px}
 /* ===== Fi Zilal al-Quran reader ===== */
 .zbody{direction:rtl;text-align:justify;font-family:Amiri,'Amiri Quran','Noto Naskh Arabic',serif;font-size:var(--zfs,19px);line-height:2;padding:14px 18px 60px;max-width:760px;margin:0 auto;color:var(--ink)}
 .zbody h2{font-size:1em;color:var(--acc2);line-height:1.7;margin:4px 0 14px;text-align:right}
@@ -276,8 +287,15 @@ html[data-theme=dark]{--pg1:#000;--pg2:#000;--mk:#f0b04f;--selbg:rgba(120,150,22
 
 <!-- ===== Fi Zilal al-Quran ===== -->
 <div class="view" id="zilalView">
-  <div class="appbar"><button class="ib backB" title="Dib"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 5l-7 7 7 7"/></svg></button><div class="ttl"><b>في ظلال القرآن</b><span id="zSub">سيد قطب</span></div><button class="ib" id="zMinus" title="Yaree qoraalka">A−</button><button class="ib" id="zPlus" title="Weynee qoraalka">A+</button></div>
+  <div class="appbar"><button class="ib backB" title="Dib"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 5l-7 7 7 7"/></svg></button><div class="ttl"><b>في ظلال القرآن</b><span id="zSub">سيد قطب</span></div><button class="ib" id="zPrint" title="Tus bogga daabacan"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6zM15 3v4h4M9 12h7M9 16h7"/></svg></button><button class="ib" id="zMinus" title="Yaree qoraalka">A−</button><button class="ib" id="zPlus" title="Weynee qoraalka">A+</button></div>
   <div class="scroll" id="zScroll"><div class="zbody" id="zBody"></div></div>
+</div>
+
+<!-- ===== Zilal printed page ===== -->
+<div class="view" id="zpView">
+  <div class="appbar"><button class="ib" id="zpBack" title="Dib"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 5l-7 7 7 7"/></svg></button><div class="ttl"><b>في ظلال القرآن · الصفحة المطبوعة</b><span id="zpSub"></span></div><button class="ib" id="zpZoom" title="Weynee"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.500-3.500M11 8v6M8 11h6"/></svg></button></div>
+  <div class="scroll" id="zpScroll"><img id="zpImg" alt=""></div>
+  <div class="zpbar"><button id="zpNext">‹ الصفحة التالية</button><button id="zpPrev">الصفحة السابقة ›</button></div>
 </div>
 
 <!-- ===== Ayah action bar ===== -->
@@ -687,14 +705,25 @@ async function openZilal(k){const[s,a]=k.split(':').map(Number);$('sheet').class
   catch(e){$('zBody').innerHTML='<div class="empty">Lama soo dejin karo — internet-ka hubi, kadibna isku day mar kale.</div>'}}
 function renderZilal(anchor){const d=ZL[zCur.s];if(!d)return;const sec=d.secs[zCur.si];
   let h=(anchor&&!zCur.ok)?'<div class="znote">Aayaddan meel gaar ah looguma helin buugga — halkan waa qaybta ugu dhow ee ay ku jirto.</div>':'';
-  h+=`<h2>${esc(sec.t)}</h2>`+sec.p.map((p,i)=>`<p${anchor&&i===zCur.pi?' class="za" id="zAnchor"':''}>${zq(p)}</p>`).join('');
+  h+=anchor?'<button class="btn zpb" id="zPrintB">📄 Tus bogga daabacan (الصفحة المطبوعة)</button>':'';h+=`<h2>${esc(sec.t)}</h2>`+sec.p.map((p,i)=>`<p${anchor&&i===zCur.pi?' class="za" id="zAnchor"':''}>${zq(p)}</p>`).join('');
   h+=`<div class="znav">${zCur.si>0?'<button class="btn" id="zPrev">› السابق</button>':'<span></span>'}${zCur.si<d.secs.length-1?'<button class="btn p" id="zNext">التالي ‹</button>':'<span></span>'}</div>`;
   $('zBody').innerHTML=h;const sc=$('zScroll');sc.scrollTop=0;
   const an=$('zAnchor');if(an&&zCur.pi>0)requestAnimationFrame(()=>{an.scrollIntoView({block:'start'})});
-  if($('zPrev'))$('zPrev').onclick=()=>{zCur.si--;renderZilal(false)};if($('zNext'))$('zNext').onclick=()=>{zCur.si++;renderZilal(false)}}
+  if($('zPrintB'))$('zPrintB').onclick=()=>openZPage(zCur.s,zCur.a);if($('zPrev'))$('zPrev').onclick=()=>{zCur.si--;renderZilal(false)};if($('zNext'))$('zNext').onclick=()=>{zCur.si++;renderZilal(false)}}
 function zFont(d){const v=Math.max(15,Math.min(30,store.get('zfs',19)+d));store.set('zfs',v);document.documentElement.style.setProperty('--zfs',v+'px')}
 zFont(0);$('zMinus').onclick=()=>zFont(-1);$('zPlus').onclick=()=>zFont(1);
 $('abZilal').onclick=()=>{if(sel)openZilal(sel)};
+// printed pages of the book (scans), indexed by ayah
+let ZPM=null,zpCur=1,zpZoom=1;const ZPN=4034,zpU=p=>'zp/'+String(p).padStart(4,'0')+'.webp';
+async function loadZPM(){if(ZPM)return ZPM;const r=await fetch('zilal/pages.json');if(!r.ok)throw new Error('x');return ZPM=await r.json()}
+async function openZPage(s,a){try{const m=await loadZPM();const p=(m.a[s]||[])[a-1]||m.start[s]||1;showView('zpView');zpGo(p)}catch(e){toast('Lama soo dejin karo — internet-ka hubi')}}
+function zpGo(p){zpCur=Math.max(1,Math.min(ZPN,p));$('zpSub').textContent=`Bogga ${zpCur} / ${ZPN}`;const im=$('zpImg');im.style.opacity=.3;
+  im.onload=()=>{im.style.opacity=1};im.onerror=()=>{im.style.opacity=1;toast('Bogga lama soo dejin karo — internet-ka hubi')};im.src=zpU(zpCur);
+  const sc=$('zpScroll');sc.scrollTop=0;sc.scrollLeft=1e6;if(zpCur<ZPN)new Image().src=zpU(zpCur+1)}
+$('zpNext').onclick=()=>zpGo(zpCur+1);$('zpPrev').onclick=()=>zpGo(zpCur-1);
+$('zpZoom').onclick=()=>{zpZoom=zpZoom>=2.1?1:zpZoom+0.6;const im=$('zpImg');im.style.width=(zpZoom*100)+'%';im.style.maxWidth=zpZoom>1?'none':'';$('zpScroll').scrollLeft=1e6};
+$('zpBack').onclick=()=>showView(zCur?'zilalView':(PREV||'indexView'));
+$('zPrint').onclick=()=>{if(zCur)openZPage(zCur.s,zCur.a)};
 // theme
 function applyTheme(m){document.documentElement.dataset.theme=m;store.set('theme',m);const mc=document.querySelector('meta[name=theme-color]');if(mc)mc.content=m==='dark'?'#0b1120':'#14213d'}
 function applyTheme2(m){applyTheme(m);store.set('theme3',m)}
@@ -722,6 +751,7 @@ window.smmBack=function(){try{
  if(on('menu')){closeMenu();return true}
  if(on('sheet')){document.getElementById('sheet').classList.remove('on');return true}
  if(on('ayBar')){clearAyah();return true}
+ if(VIEW==='zpView'&&zCur){showView('zilalView');return true}
  if(VIEW!=='indexView'&&VIEW!=='mushafView'){showView(PREV||'mushafView');return true}
  if(VIEW==='mushafView'){showView('indexView');return true}
 }catch(e){}return false};
