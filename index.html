@@ -152,6 +152,18 @@ textarea{width:calc(100% - 24px);margin:0 12px;min-height:110px;font-family:ui-m
 .modal.on{display:flex}
 .mbox{background:var(--card);color:var(--ink);border-radius:16px;padding:18px;width:min(92vw,340px)}
 .mbox input{width:100%;font-size:18px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);margin:10px 0}
+/* ===== Fi Zilal al-Quran reader ===== */
+.zbody{direction:rtl;text-align:justify;font-family:Amiri,'Amiri Quran','Noto Naskh Arabic',serif;font-size:var(--zfs,19px);line-height:2;padding:14px 18px 60px;max-width:760px;margin:0 auto;color:var(--ink)}
+.zbody h2{font-size:1em;color:var(--acc2);line-height:1.7;margin:4px 0 14px;text-align:right}
+.zbody p{margin:0 0 .7em}
+.zbody p.za{background:var(--playbg);border-radius:8px;padding:6px 10px;margin:0 -10px .7em;scroll-margin-top:10px}
+.zq{color:var(--acc2);font-weight:700}
+.znote{font-family:Inter,system-ui,sans-serif;direction:ltr;text-align:left;font-size:13px;color:var(--mute);background:var(--sel);border-radius:10px;padding:8px 11px;margin-bottom:12px;line-height:1.5}
+.znav{display:flex;gap:10px;justify-content:space-between;margin-top:22px}
+.znav .btn{font-family:inherit;font-size:16px}
+#zilalView{background:var(--paper)}
+#zilalView .ib{font-size:15px;font-weight:700}
+.aybar button#abZilal{width:auto;padding:0 13px;font:700 16px Amiri,'Amiri Quran',serif}
 /* ===== v3 reader: mushaf page laid out like Quran for Android ===== */
 :root{--pg1:#ebe4d1;--pg2:#fcf9f0;--mk:#b06f0a;--selbg:rgba(46,84,150,.16);--playbg:rgba(233,162,59,.30)}
 html[data-theme=dark]{--pg1:#000;--pg2:#000;--mk:#f0b04f;--selbg:rgba(120,150,225,.30);--playbg:rgba(240,176,79,.30)}
@@ -262,11 +274,18 @@ html[data-theme=dark]{--pg1:#000;--pg2:#000;--mk:#f0b04f;--selbg:rgba(120,150,22
   </div></div>
 </div>
 
+<!-- ===== Fi Zilal al-Quran ===== -->
+<div class="view" id="zilalView">
+  <div class="appbar"><button class="ib backB" title="Dib"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 5l-7 7 7 7"/></svg></button><div class="ttl"><b>في ظلال القرآن</b><span id="zSub">سيد قطب</span></div><button class="ib" id="zMinus" title="Yaree qoraalka">A−</button><button class="ib" id="zPlus" title="Weynee qoraalka">A+</button></div>
+  <div class="scroll" id="zScroll"><div class="zbody" id="zBody"></div></div>
+</div>
+
 <!-- ===== Ayah action bar ===== -->
 <div class="aybar" id="ayBar">
   <button id="abBm" title="Calaamad"><svg viewBox="0 0 24 24"><path d="M17 3H7a2 2 0 00-2 2v16l7-3 7 3V5a2 2 0 00-2-2zm0 15l-5-2.2L7 18V5h10z"/></svg></button>
   <button id="abWords" title="Fasiraadda erayada"><svg viewBox="0 0 24 24"><path d="M21 5c-1.1-.35-2.3-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.450 4.900 1 6v14.650c0 .25.250.5.5.5.1 0 .15-.05.250-.05C3.100 20.450 5.050 20 6.500 20c1.950 0 4.050.4 5.500 1.500 1.350-.85 3.800-1.500 5.500-1.500 1.650 0 3.350.3 4.750 1.050.1.05.15.05.250.05.250 0 .5-.250.5-.5V6c-.6-.45-1.250-.750-2-1zm0 13.500c-1.100-.350-2.300-.5-3.500-.5-1.700 0-4.150.650-5.500 1.500V8c1.350-.850 3.800-1.500 5.500-1.500 1.200 0 2.400.150 3.500.5z"/></svg></button>
   <button id="abShare" title="La wadaag"><svg viewBox="0 0 24 24"><path d="M18 16.080c-.76 0-1.440.3-1.960.77L8.910 12.700c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.050-4.110c.54.5 1.250.81 2.040.81 1.660 0 3-1.340 3-3s-1.340-3-3-3-3 1.340-3 3c0 .24.04.47.09.7L8.040 9.810C7.500 9.310 6.790 9 6 9c-1.660 0-3 1.340-3 3s1.340 3 3 3c.79 0 1.500-.31 2.040-.81l7.120 4.160c-.05.21-.08.43-.08.65 0 1.610 1.310 2.920 2.920 2.920s2.920-1.310 2.920-2.920-1.310-2.920-2.920-2.920z"/></svg></button>
+  <button id="abZilal" title="في ظلال القرآن">الظلال</button>
   <button id="abPlay" title="Dhageyso tafsiirka"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
   <i class="tip"></i>
 </div>
@@ -464,13 +483,13 @@ function openAyah(k){
   const les=lessonFor(s,a);const have=les&&HAVE.has(les.id);
   let h=`<div class="aytxt">${esc(AYTXT[k]||'')} <span class="em">۝${AD(a)}</span></div><div class="acts">`;
   h+=have?`<button class="btn p" id="playAy">▶ Dhageyso tafsiirka</button>`:(les?`<label class="btn p">＋ Soo geli casharka ${les.num}<input type="file" id="oneFile" accept="audio/*,.mp3" hidden></label>`:'');
-  h+=`<button class="btn" id="bmAy">${isBM(k)?'🔖 La calaamadeeyay':'🔖 Calaamadee'}</button><button class="btn" id="prevAy">‹ Aayaddii hore</button><button class="btn" id="nextAy">Aayadda xigta ›</button></div>`;
+  h+=`<button class="btn" id="zlAy">📖 في ظلال القرآن</button><button class="btn" id="bmAy">${isBM(k)?'🔖 La calaamadeeyay':'🔖 Calaamadee'}</button><button class="btn" id="prevAy">‹ Aayaddii hore</button><button class="btn" id="nextAy">Aayadda xigta ›</button></div>`;
   if(les){const mk=(MARKS[les.num]||{})[k];h+=`<div class="note">Casharka <b>${les.num}</b> · ${esc(rangeTxt(les))}<br><span style="font-size:12px">${esc(les.name)}.mp3</span><br>${!have?'Faylkan weli lama soo gelin (wuu soo socdaa).':mk!=null?'Aayaddan waxay ka bilaabanaysaa '+fmt(mk)+' (la calaamadeeyay).':(DUR[les.num]?'Qiyaas ahaan waxay ka bilaabanaysaa '+fmt(ayahTime(les,k,DUR[les.num])[1])+'. Haddii aad maqasho in ay khaldan tahay, taabo 📍 marka aayaddu bilaabato.':'Waqtiga aayadda waa la qiyaasi doonaa marka casharka la furo.')}</div>`}
   h+=`<div class="h3">Fasiraadda erayada (${words.length})</div>`;
   h+=words.length?`<div class="wl">${words.map(r=>`<div class="wi"><div class="ar">${esc(r[0])}</div><div class="so">${esc(r[1]||'—')}</div></div>`).join('')}</div>`:`<div class="note">Aayaddan eray fasiraad ah kuma jiro buugga.</div>`;
   $('shB').innerHTML=h;$('sheet').classList.add('on');$('shB').scrollTop=0;
   const pa=$('playAy');if(pa)pa.onclick=()=>playAyah(s,a);const of=$('oneFile');if(of)of.onchange=e=>addFiles([...e.target.files]);
-  $('bmAy').onclick=()=>toggleBM(k);$('prevAy').onclick=()=>stepAyah(s,a,-1);$('nextAy').onclick=()=>stepAyah(s,a,1);
+  $('zlAy').onclick=()=>openZilal(k);$('bmAy').onclick=()=>toggleBM(k);$('prevAy').onclick=()=>stepAyah(s,a,-1);$('nextAy').onclick=()=>stepAyah(s,a,1);
 }
 function stepAyah(s,a,d){a+=d;if(a<1){if(s===1)return;s--;a=COUNTS[s-1]}else if(a>COUNTS[s-1]){if(s===114)return;s++;a=1}const k=s+':'+a;if(AYPAGE[k]!==cur)go(AYPAGE[k]);selectAyah(k)}
 $('shX').onclick=()=>{$('sheet').classList.remove('on')};
@@ -658,6 +677,24 @@ $('pMark').onclick=()=>{
 };
 $('exp').onclick=async()=>{const txt=JSON.stringify({app:'smm-tafsiir',v:2,marks:MARKS});$('mapTxt').value=txt;try{await navigator.clipboard.writeText(txt);toast('Waa la koobiyeeyay')}catch(e){$('mapTxt').select();toast('Ka koobi sanduuqa hoose')}};
 $('imp').onclick=()=>{try{const o=JSON.parse($('mapTxt').value);if(!o.marks)throw 0;for(const[n,m]of Object.entries(o.marks))MARKS[n]=Object.assign(MARKS[n]||{},m);saveMarks();renderLessons();toast('Calaamadaha waa la soo geliyay')}catch(e){toast('Qoraalka sax maaha')}};
+// ---------- Fi Zilal al-Quran (Arabic tafsiir book), loaded per surah ----------
+const ZL={};let zCur=null;
+async function loadZilal(s){if(ZL[s])return ZL[s];const r=await fetch('zilal/'+String(s).padStart(3,'0')+'.json');if(!r.ok)throw new Error('x');return ZL[s]=await r.json()}
+function zq(p){return esc(p).replace(/\(([^()]{6,400})\)/g,(m,q)=>/[ء-ي]{3}/.test(q)?`<span class="zq">(${q})</span>`:m)}
+async function openZilal(k){const[s,a]=k.split(':').map(Number);$('sheet').classList.remove('on');showView('zilalView');
+  $('zSub').textContent=`${NAMES[s-1]} · الآية ${AD(a)}`;$('zBody').innerHTML='<div class="empty">…</div>';
+  try{const d=await loadZilal(s);const an=d.a[a]||[0,0,0];zCur={s,a,si:an[0],pi:an[1],ok:an[2]};renderZilal(true)}
+  catch(e){$('zBody').innerHTML='<div class="empty">Lama soo dejin karo — internet-ka hubi, kadibna isku day mar kale.</div>'}}
+function renderZilal(anchor){const d=ZL[zCur.s];if(!d)return;const sec=d.secs[zCur.si];
+  let h=(anchor&&!zCur.ok)?'<div class="znote">Aayaddan meel gaar ah looguma helin buugga — halkan waa qaybta ugu dhow ee ay ku jirto.</div>':'';
+  h+=`<h2>${esc(sec.t)}</h2>`+sec.p.map((p,i)=>`<p${anchor&&i===zCur.pi?' class="za" id="zAnchor"':''}>${zq(p)}</p>`).join('');
+  h+=`<div class="znav">${zCur.si>0?'<button class="btn" id="zPrev">› السابق</button>':'<span></span>'}${zCur.si<d.secs.length-1?'<button class="btn p" id="zNext">التالي ‹</button>':'<span></span>'}</div>`;
+  $('zBody').innerHTML=h;const sc=$('zScroll');sc.scrollTop=0;
+  const an=$('zAnchor');if(an&&zCur.pi>0)requestAnimationFrame(()=>{sc.scrollTop=Math.max(0,an.offsetTop-12)});
+  if($('zPrev'))$('zPrev').onclick=()=>{zCur.si--;renderZilal(false)};if($('zNext'))$('zNext').onclick=()=>{zCur.si++;renderZilal(false)}}
+function zFont(d){const v=Math.max(15,Math.min(30,store.get('zfs',19)+d));store.set('zfs',v);document.documentElement.style.setProperty('--zfs',v+'px')}
+zFont(0);$('zMinus').onclick=()=>zFont(-1);$('zPlus').onclick=()=>zFont(1);
+$('abZilal').onclick=()=>{if(sel)openZilal(sel)};
 // theme
 function applyTheme(m){document.documentElement.dataset.theme=m;store.set('theme',m);const mc=document.querySelector('meta[name=theme-color]');if(mc)mc.content=m==='dark'?'#0b1120':'#14213d'}
 function applyTheme2(m){applyTheme(m);store.set('theme3',m)}
