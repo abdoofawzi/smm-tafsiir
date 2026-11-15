@@ -747,6 +747,7 @@ render();
 /* Android back button: close the top-most panel, return true if handled */
 window.smmBack=function(){try{
  var on=function(id){var e=document.getElementById(id);return e&&e.classList.contains('on')};
+ if(on('langModal')){if(localStorage.getItem('smm_lang'))document.getElementById('langModal').classList.remove('on');return true}
  if(on('pgModal')){document.getElementById('pgModal').classList.remove('on');return true}
  if(on('menu')){closeMenu();return true}
  if(on('sheet')){document.getElementById('sheet').classList.remove('on');return true}
@@ -755,6 +756,138 @@ window.smmBack=function(){try{
  if(VIEW!=='indexView'&&VIEW!=='mushafView'){showView(PREV||'mushafView');return true}
  if(VIEW==='mushafView'){showView('indexView');return true}
 }catch(e){}return false};
+</script>
+<style>
+html[dir=rtl] .player,html[dir=rtl] .aybar,html[dir=rtl] .rbot,html[dir=rtl] .times,html[dir=rtl] .zpbar,html[dir=rtl] .wi,html[dir=rtl] .card .top2{direction:ltr}
+html[dir=rtl] #rBack svg,html[dir=rtl] .backB svg,html[dir=rtl] #zpBack svg{transform:scaleX(-1)}
+html[dir=rtl] .menu{right:auto;left:8px}
+html[dir=rtl] .menu button,html[dir=rtl] .row,html[dir=rtl] .cont{text-align:right}
+html[dir=rtl] .row .pg{text-align:left}
+html[dir=rtl] .res-ay .r,html[dir=rtl] .znote,html[dir=rtl] .zbody .zpb{direction:rtl;text-align:right}
+html[dir=rtl] .cont .go{margin-left:0;margin-right:auto}
+html[dir=rtl] body{font-family:'Noto Sans Arabic','Segoe UI',Tahoma,system-ui,sans-serif}
+.langbox button{display:block;width:100%;margin:8px 0 0;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:17px;font-weight:600}
+.langbox button.cur{background:var(--bar);color:var(--onbar);border-color:var(--bar)}
+</style>
+<div class="modal" id="langModal"><div class="mbox langbox"><b>Luqadda · اللغة · Language</b>
+<button data-l="so">Soomaali</button><button data-l="ar" dir="rtl">العربية</button><button data-l="en">English</button></div></div>
+<script>
+/* ===== interface languages: Somali (source), Arabic, English ===== */
+(function(){
+var saved=null;try{saved=localStorage.getItem('smm_lang')}catch(e){}
+var nav=(navigator.language||'so').toLowerCase();
+var guess=nav.indexOf('ar')===0?'ar':(nav.indexOf('so')===0?'so':'so');
+var lang=saved||guess;if(['so','ar','en'].indexOf(lang)<0)lang='so';
+window.SMM_LANG=lang;
+var D={
+"Tafsiirka Sh. Maxamed Macallin":["تفسير الشيخ محمد معلم","Tafsiir of Sh. Maxamed Macallin"],
+"Qur'aanka · Fasiraadda · Casharrada":["القرآن · معاني الكلمات · الدروس","Quran · Word meanings · Lessons"],
+"Suuradaha":["السور","Surahs"],"Juz'":["الأجزاء","Juz'"],"Calaamado":["العلامات","Bookmarks"],
+"Qaamuuska Erayada":["قاموس الكلمات","Word dictionary"],"Qaamuuska erayada":["قاموس الكلمات","Word dictionary"],
+"Tanqiix Fasiraadda Ereyada Qur'aanka":["تنقيح تفسير كلمات القرآن (بالصومالية)","Tanqiix Fasiraadda Ereyada Qur'aanka (Somali)"],
+"Casharrada Maqalka":["الدروس الصوتية","Audio lessons"],"Casharrada maqalka":["الدروس الصوتية","Audio lessons"],
+"diyaar":["جاهز","ready"],"Casharrada Sheekha":["دروس الشيخ","The Sheikh's lessons"],
+"Casharrada waxay si toos ah uga yimaadaan internet-ka (archive.org). Haddii aad faylasha MP3 taleefankaaga ku haysato, halkan ka soo geli si ay internet la'aan u shaqeeyaan.":["تُبَثّ الدروس مباشرة من الإنترنت (archive.org). إن كانت ملفات MP3 على هاتفك فأضفها من هنا لتعمل بلا إنترنت.","Lessons stream directly from the internet (archive.org). If you have the MP3 files on your phone, add them here so they work offline."],
+"Ku dar faylasha":["إضافة ملفات","Add files"],"Calaamadaha waqtiga":["علامات التوقيت","Time marks"],
+"Calaamaduhu waa waqtiga ay aayad kasta ka bilaabanto casharka dhexdiisa. Koobi ka samee oo noo soo dir si loogu daro dhammaan dadka.":["العلامات هي الوقت الذي تبدأ عنده كل آية داخل الدرس. انسخها وأرسلها إلينا لتُضاف لجميع المستخدمين.","Marks are the time each ayah starts inside a lesson. Copy them and send them to us so everyone gets them."],
+"Koobi calaamadaha":["نسخ العلامات","Copy marks"],"Soo geli calaamado":["استيراد علامات","Import marks"],
+"U gudub bog":["الانتقال إلى صفحة","Go to page"],"Gudub":["انتقال","Go"],"Jooji":["إلغاء","Cancel"],
+"Habeen / maalin":["الوضع الليلي / النهاري","Night / day mode"],"Luqadda":["اللغة","Language"],
+"Aayadda xigta":["الآية التالية","Next ayah"],"Aayaddii hore":["الآية السابقة","Previous ayah"],
+"Bogga xiga":["الصفحة التالية","Next page"],"Boggii hore":["الصفحة السابقة","Previous page"],
+"Calaamad":["علامة","Bookmark"],"Calaamadaha (JSON)":["العلامات (JSON)","Marks (JSON)"],
+"Calaamadee":["ضع علامة","Bookmark"],"La calaamadeeyay":["عليها علامة","Bookmarked"],
+"Calaamadee boggan":["ضع علامة على هذه الصفحة","Bookmark this page"],"Ciyaar / hakad":["تشغيل / إيقاف مؤقت","Play / pause"],
+"Dhageyso tafsiirka":["استمع إلى التفسير","Listen to the tafsiir"],"Dib":["رجوع","Back"],"Faahfaahin":["التفاصيل","Details"],
+"Fasiraadda erayada":["معاني الكلمات","Word meanings"],"Fasiraadda erayada boggan":["معاني كلمات هذه الصفحة","Word meanings on this page"],
+"La wadaag":["مشاركة","Share"],"Menu":["القائمة","Menu"],
+"Qor eray Carabi ama Soomaali…":["اكتب كلمة بالعربية أو الصومالية…","Type a word in Arabic or Somali…"],"Raadi":["بحث","Search"],
+"Raadi cashar (lambar ama suurad)…":["ابحث عن درس (رقم أو سورة)…","Find a lesson (number or surah)…"],
+"Raadi suurad ama eray Qur'aan ah…":["ابحث عن سورة أو كلمة قرآنية…","Search a surah or a Quran word…"],
+"Tus bogga daabacan":["عرض الصفحة المطبوعة","Show printed page"],"Tus bogga daabacan (الصفحة المطبوعة)":["عرض الصفحة المطبوعة","Show printed page"],
+"Weynee":["تكبير","Zoom"],"Weynee qoraalka":["تكبير الخط","Larger text"],"Yaree qoraalka":["تصغير الخط","Smaller text"],"Xawaaraha":["السرعة","Speed"],
+"Casharka":["الدرس","Lesson"],
+"Faylkan weli lama soo gelin (wuu soo socdaa).":["هذا الملف لم يُضف بعد.","This file hasn't been added yet."],
+"Waqtiga aayadda waa la qiyaasi doonaa marka casharka la furo.":["سيُقدَّر توقيت الآية عند فتح الدرس.","The ayah's time will be estimated when the lesson opens."],
+"Aayaddan eray fasiraad ah kuma jiro buugga.":["لا توجد في الكتاب كلمات مفسَّرة لهذه الآية.","The book has no word meanings for this ayah."],
+"Boggan eray fasiraad ah kuma jiro buugga.":["لا توجد في الكتاب كلمات مفسَّرة لهذه الصفحة.","The book has no word meanings for this page."],
+"Sii wad akhriska":["متابعة القراءة","Continue reading"],"Fur":["فتح","Open"],
+"Lama helin. Isku day eray gaaban.":["لا نتائج. جرّب كلمة أقصر.","Nothing found. Try a shorter word."],
+"Weli calaamad ma jirto.":["لا توجد علامات بعد.","No bookmarks yet."],
+"Akhriska dhexdiisa, taabo aayad kadibna 🔖 Calaamad.":["أثناء القراءة اضغط على آية ثم 🔖.","While reading, tap an ayah, then 🔖."],
+"Calaamad waa la dhigay":["تم وضع العلامة","Bookmark added"],"Calaamadda waa laga qaaday":["أزيلت العلامة","Bookmark removed"],
+"Qor eray (tusaale: الصراط ama naxariis). Natiijo kasta waxaad ka furi kartaa bogga Qur'aanka.":["اكتب كلمة (مثال: الصراط أو naxariis). يمكنك فتح صفحة المصحف من أي نتيجة.","Type a word (e.g. الصراط or naxariis). You can open the Quran page from any result."],
+"Fur bogga aayadda":["افتح صفحة الآية","Open the ayah's page"],"fayl la'aan":["بلا ملف","no file"],
+"Casharkan weli internet-ka laguma soo dhejin":["هذا الدرس غير متوفر على الإنترنت بعد","This lesson isn't online yet"],
+"Waqti qiyaas ah — haddii uu khaldan yahay, taabo 📍 marka aayaddu bilaabato":["توقيت تقريبي — إن كان خاطئًا فاضغط 📍 عند بداية الآية","Estimated time — if it's wrong, tap 📍 when the ayah begins"],
+"Taabo ▶ si uu u bilaabo":["اضغط ▶ للبدء","Tap ▶ to start"],
+"Maqalka lama soo dejin karo hadda — internet-ka hubi, ama faylka ka soo geli taleefanka.":["تعذّر تحميل الصوت الآن — تحقق من الإنترنت أو أضف الملف من الهاتف.","Can't load the audio now — check the internet, or add the file from your phone."],
+"Waa la koobiyeeyay":["تم النسخ","Copied"],"Ka koobi sanduuqa hoose":["انسخ من المربع أدناه","Copy from the box below"],
+"Calaamadaha waa la soo geliyay":["تم استيراد العلامات","Marks imported"],"Qoraalka sax maaha":["النص غير صحيح","The text isn't valid"],
+"Aayadda waa la koobiyeeyay":["نُسخت الآية","Ayah copied"],"Lama koobiyeyn karo":["تعذّر النسخ","Couldn't copy"],
+"Lama soo dejin karo — internet-ka hubi, kadibna isku day mar kale.":["تعذّر التحميل — تحقق من الإنترنت ثم حاول مجددًا.","Couldn't load — check the internet and try again."],
+"Aayaddan meel gaar ah looguma helin buugga — halkan waa qaybta ugu dhow ee ay ku jirto.":["لم يُعثر على موضع خاص لهذه الآية في الكتاب — هذا أقرب مقطع يتناولها.","This ayah has no passage of its own in the book — this is the nearest section that covers it."],
+"Lama soo dejin karo — internet-ka hubi":["تعذّر التحميل — تحقق من الإنترنت","Couldn't load — check the internet"],
+"Bogga lama soo dejin karo — internet-ka hubi":["تعذّر تحميل الصفحة — تحقق من الإنترنت","Couldn't load the page — check the internet"]
+};
+var A={"Jooji":["إيقاف","Stop"],"Calaamadee":["ضع علامة توقيت","Mark time"]};
+var li=lang==='ar'?0:1;
+var MK={Makki:['مكية','Meccan'],Madani:['مدنية','Medinan']};
+var R=[
+[/^Bogga (\d+), Juz' (\d+)$/,["الصفحة $1، الجزء $2","Page $1, Juz' $2"]],
+[/^Bogga (\d+) \/ (\d+)$/,["الصفحة $1 / $2","Page $1 / $2"]],
+[/^Bogga (\d+) · (.*)$/,["الصفحة $1 · $2","Page $1 · $2"]],
+[/^Bogga (\d+)$/,["الصفحة $1","Page $1"]],
+[/^Juz'? (\d+)$/,["الجزء $1","Juz' $1"]],
+[/^(.*) · Aayadda (\d+)$/,["$1 · الآية $2","$1 · Ayah $2"]],
+[/^Suuradda (\d+) · Bogga (\d+)$/,["السورة $1 · الصفحة $2","Surah $1 · Page $2"]],
+[/^Soo geli casharka (\d+)$/,["أضف الدرس $1","Add lesson $1"]],
+[/^Calaamadee: aayadda (\d+) halkan ayay ka bilaabataa$/,["ضع علامة: الآية $1 تبدأ هنا","Mark: ayah $1 starts here"]],
+[/^Aayaddan waxay ka bilaabanaysaa ([\d:]+) \(la calaamadeeyay\)\.$/,["تبدأ هذه الآية عند $1 (توقيت مضبوط).","This ayah starts at $1 (exact mark)."]],
+[/^Qiyaas ahaan waxay ka bilaabanaysaa ([\d:]+)\. Haddii aad maqasho in ay khaldan tahay, taabo 📍 marka aayaddu bilaabato\.$/,["تبدأ تقريبًا عند $1. إن وجدت التوقيت خاطئًا فاضغط 📍 عند بداية الآية.","Starts at about $1. If that's wrong, tap 📍 when the ayah begins."]],
+[/^Fasiraadda erayada \((\d+)\)$/,["معاني الكلمات ($1)","Word meanings ($1)"]],
+[/^Fasiraadda erayada · Bogga (\d+)$/,["معاني الكلمات · الصفحة $1","Word meanings · Page $1"]],
+[/^(\d+) eray$/,["$1 كلمة","$1 words"]],
+[/^(Makki|Madani) · (\d+) aayadood$/,function(m){return MK[m[1]][li]+' · '+m[2]+(li?' ayahs':' آية')}],
+[/^Aayadaha \((\d+\+?)\)$/,["الآيات ($1)","Ayahs ($1)"]],
+[/^(.*) · bogga (\d+)$/,["$1 · الصفحة $2","$1 · page $2"]],
+[/^(\d+) natiijo$/,["$1 نتيجة","$1 results"]],
+[/^(.*) · (\d+) calaamad$/,["$1 · $2 علامة","$1 · $2 marks"]],
+[/^(\d+) kale — raadi si aad u aragto\.$/,["$1 أخرى — ابحث لعرضها.","$1 more — search to see them."]],
+[/^(\d+) cashar ayaa la xiray(?: · (\d+) fayl lama garan)?$/,function(m){return li?(m[1]+' lessons linked'+(m[2]?' · '+m[2]+' files not recognised':'')):('تم ربط '+m[1]+' درسًا'+(m[2]?' · '+m[2]+' ملفات غير معروفة':''))}],
+[/^Faylka casharka (\d+) weli lama soo gelin$/,["ملف الدرس $1 لم يُضف بعد","Lesson $1's file hasn't been added yet"]],
+[/^Aayadda (\d+) → ([\d:]+) waa la kaydiyay$/,["حُفظت الآية $1 ← $2","Ayah $1 → $2 saved"]],
+[/^Casharka (\d+) · (.*)$/,["الدرس $1 · $2","Lesson $1 · $2"]],
+[/^Hadda: (.*)$/,["الآن: $1","Now: $1"]]
+];
+var EDGE=/^([^A-Za-z0-9؀-ۿ]*)([\s\S]*?)([^A-Za-z0-9؀-ۿ.…)']*)$/;
+function tr(s,attr){
+  if(!s||s.length>300||!/[A-Za-z]{2}/.test(s))return null;
+  var m=EDGE.exec(s);if(!m||!m[2])return null;var core=m[2].replace(/ /g,' '),out=null;
+  if(attr&&A[core])out=A[core][li];else if(D[core])out=D[core][li];
+  else for(var i=0;i<R.length;i++){var x=R[i][0].exec(core);if(x){var t=R[i][1];out=typeof t==='function'?t(x):t[li].replace(/\$(\d)/g,function(_,n){return x[+n]||''});break}}
+  if(out===null||out===core)return null;return m[1]+out+m[3];
+}
+var SKIP='.lines,.zbody p,.zbody h2,.wi,.card .m,.card .w2,.aytxt,.res-ay .t,textarea,script,style,.langbox';
+function tn(n){var v=n.nodeValue;if(!v||!/[A-Za-z]{2}/.test(v))return;var p=n.parentElement;if(!p||p.closest(SKIP))return;var o=tr(v,false);if(o!==null)n.nodeValue=o}
+function at(el){if(!el.getAttribute)return;['title','placeholder'].forEach(function(a){var v=el.getAttribute(a);if(v){var o=tr(v,true);if(o!==null)el.setAttribute(a,o)}})}
+function walk(node){if(node.nodeType===3){tn(node);return}if(node.nodeType!==1)return;at(node);
+  var w=document.createTreeWalker(node,NodeFilter.SHOW_TEXT|NodeFilter.SHOW_ELEMENT,null),c;while((c=w.nextNode())){if(c.nodeType===3)tn(c);else at(c)}}
+// language menu + chooser
+var modal=document.getElementById('langModal');
+function showLang(){modal.querySelectorAll('button').forEach(function(b){b.classList.toggle('cur',b.dataset.l===lang)});modal.classList.add('on')}
+modal.querySelectorAll('button').forEach(function(b){b.onclick=function(){try{localStorage.setItem('smm_lang',b.dataset.l)}catch(e){}if(b.dataset.l===lang&&saved){modal.classList.remove('on');return}location.reload()}});
+modal.addEventListener('click',function(e){if(e.target===modal&&saved)modal.classList.remove('on')});
+var mb=document.createElement('button');mb.innerHTML='🌐&nbsp; Luqadda';mb.onclick=function(){try{closeMenu()}catch(e){}showLang()};document.getElementById('menu').appendChild(mb);
+window.smmLang=showLang;
+if(lang!=='so'){
+  if(lang==='ar'){document.documentElement.dir='rtl';document.documentElement.lang='ar'}else document.documentElement.lang='en';
+  walk(document.body);
+  new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){var m=ms[i];if(m.type==='characterData')tn(m.target);else if(m.type==='attributes')at(m.target);else for(var j=0;j<m.addedNodes.length;j++)walk(m.addedNodes[j])}})
+    .observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['title','placeholder']});
+}
+if(!saved)showLang();
+})();
 </script>
 </body>
 </html>
