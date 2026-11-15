@@ -860,7 +860,7 @@ var R=[
 [/^Casharka (\d+) · (.*)$/,["الدرس $1 · $2","Lesson $1 · $2"]],
 [/^Hadda: (.*)$/,["الآن: $1","Now: $1"]]
 ];
-var EDGE=/^([^A-Za-z؀-ۿ]*)([\s\S]*?)([^A-Za-z؀-ۿ.…)']*)$/;
+var EDGE=/^([^A-Za-z0-9؀-ۿ]*)([\s\S]*?)([^A-Za-z0-9؀-ۿ.…)']*)$/;
 function tr(s,attr){
   if(!s||s.length>300||!/[A-Za-z]{2}/.test(s))return null;
   var m=EDGE.exec(s);if(!m||!m[2])return null;var core=m[2].replace(/ /g,' '),out=null;
