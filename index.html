@@ -690,7 +690,7 @@ function renderZilal(anchor){const d=ZL[zCur.s];if(!d)return;const sec=d.secs[zC
   h+=`<h2>${esc(sec.t)}</h2>`+sec.p.map((p,i)=>`<p${anchor&&i===zCur.pi?' class="za" id="zAnchor"':''}>${zq(p)}</p>`).join('');
   h+=`<div class="znav">${zCur.si>0?'<button class="btn" id="zPrev">› السابق</button>':'<span></span>'}${zCur.si<d.secs.length-1?'<button class="btn p" id="zNext">التالي ‹</button>':'<span></span>'}</div>`;
   $('zBody').innerHTML=h;const sc=$('zScroll');sc.scrollTop=0;
-  const an=$('zAnchor');if(an&&zCur.pi>0)requestAnimationFrame(()=>{sc.scrollTop=Math.max(0,an.offsetTop-12)});
+  const an=$('zAnchor');if(an&&zCur.pi>0)requestAnimationFrame(()=>{an.scrollIntoView({block:'start'})});
   if($('zPrev'))$('zPrev').onclick=()=>{zCur.si--;renderZilal(false)};if($('zNext'))$('zNext').onclick=()=>{zCur.si++;renderZilal(false)}}
 function zFont(d){const v=Math.max(15,Math.min(30,store.get('zfs',19)+d));store.set('zfs',v);document.documentElement.style.setProperty('--zfs',v+'px')}
 zFont(0);$('zMinus').onclick=()=>zFont(-1);$('zPlus').onclick=()=>zFont(1);
